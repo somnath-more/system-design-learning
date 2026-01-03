@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class TinyServiceDto {
-    @NotBlank(message = "Email is mandatory")
+    @NotBlank(message = "Original is mandatory")
     private String originalUrl;
 
 }

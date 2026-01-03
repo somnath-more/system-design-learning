@@ -6,6 +6,8 @@ import com.tinyurl.backend.repository.TinyUrlRepository;
 import com.tinyurl.backend.service.TinyService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -17,6 +19,7 @@ import static java.lang.Long.decode;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TinyServiceImpl implements TinyService {
     private final TinyUrlRepository tinyUrlRepository;
     private final Base62Service base62Service;
@@ -32,14 +35,17 @@ public class TinyServiceImpl implements TinyService {
     }
 
 
+    @Override
     public String redirect(String shortCode) {
-        // Convert the short string back to a numeric ID
-        long id = decode(shortCode);
+        log.info("Received shortCode: {}", shortCode);
+        long id = base62Service.decode(shortCode); // decode Base62 to numeric ID
+        log.info("Decoded ID from shortCode: {}", id);
 
-        // Find the record or throw an error if the code doesn't exist
         TinyUrl entity = tinyUrlRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("URL not found for code: " + shortCode));
 
+        log.info("Redirecting to original URL: {}", entity.getOriginalUrl());
         return entity.getOriginalUrl();
     }
+
 }

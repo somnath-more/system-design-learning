@@ -14,4 +14,14 @@ public class Base62Service {
         }
         return sb.reverse().toString();
     }
+    public long decode(String shortCode) {
+        long id = 0;
+        for (char c : shortCode.toCharArray()) {
+            int index = ALPHABET.indexOf(c);
+            if (index == -1) throw new IllegalArgumentException("Invalid shortCode: " + shortCode);
+            id = id * 62 + index;
+        }
+        System.out.println("Decoded shortCode " + shortCode + " to ID: " + id);
+        return id;
+    }
 }
