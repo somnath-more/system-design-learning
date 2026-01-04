@@ -23,6 +23,7 @@ import static java.lang.Long.decode;
 public class TinyServiceImpl implements TinyService {
     private final TinyUrlRepository tinyUrlRepository;
     private final Base62Service base62Service;
+    private final RedisCacheService redisCacheService;
     @Override
     public Optional<String> shortenURL(TinyServiceDto tinyServiceDto) {
 
@@ -30,22 +31,38 @@ public class TinyServiceImpl implements TinyService {
         TinyUrl tinyUrl = TinyUrl.builder()
                 .originalUrl(tinyServiceDto.getOriginalUrl())
                 .build();
-        TinyUrl tinyUrl1= tinyUrlRepository.save(tinyUrl);
-        return Optional.of(base62Service.encode(tinyUrl1.getId()));
+        TinyUrl saveUrl= tinyUrlRepository.save(tinyUrl);
+        // Encode to Base62 shortCode
+        String shortCode = base62Service.encode(saveUrl.getId());
+        // Save in Redis
+        redisCacheService.saveUrl(shortCode, tinyServiceDto.getOriginalUrl());
+        return Optional.of(shortCode);
     }
 
 
     @Override
     public String redirect(String shortCode) {
-        log.info("Received shortCode: {}", shortCode);
-        long id = base62Service.decode(shortCode); // decode Base62 to numeric ID
-        log.info("Decoded ID from shortCode: {}", id);
+        // 1. Check Redis first
+        String cachedUrl = redisCacheService.getUrl(shortCode);
+        if (cachedUrl != null) {
+            log.info("URL found in Redis cache: {}", cachedUrl);
+            return cachedUrl;
+        }
 
+        // 2. Decode shortCode to numeric ID
+        long id = base62Service.decode(shortCode);
+        log.info("Decoded ID: {}", id);
+
+        // 3. Fetch from DB if not in Redis
         TinyUrl entity = tinyUrlRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("URL not found for code: " + shortCode));
 
-        log.info("Redirecting to original URL: {}", entity.getOriginalUrl());
-        return entity.getOriginalUrl();
+        String originalUrl = entity.getOriginalUrl();
+        // 4. Save to Redis for future requests
+        redisCacheService.saveUrl(shortCode, originalUrl);
+
+        log.info("URL saved to Redis cache: {}", originalUrl);
+        return originalUrl;
     }
 
 }
