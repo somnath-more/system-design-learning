@@ -4,6 +4,7 @@ import com.library.dto.AuthorDTO;
 import com.library.entity.Author;
 import com.library.exception.ResourceNotFoundException;
 import com.library.repository.AuthorRepository;
+import com.library.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AuthorService {
+public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
 

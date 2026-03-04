@@ -1,12 +1,12 @@
 package com.library.controller;
 
 import com.library.dto.AuthorDTO;
-import com.library.service.impl.AuthorService;
+import com.library.service.AuthorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +20,7 @@ class AuthorController {
     private final AuthorService authorService;
 
     @PostMapping
-//    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     public ResponseEntity<AuthorDTO.Response> createAuthor(@Valid @RequestBody AuthorDTO.Request request) {
         AuthorDTO.Response response = authorService.createAuthor(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -39,7 +39,7 @@ class AuthorController {
     }
 
     @PutMapping("/{id}")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     public ResponseEntity<AuthorDTO.Response> updateAuthor(
             @PathVariable Long id,
             @Valid @RequestBody AuthorDTO.Request request) {
@@ -48,7 +48,7 @@ class AuthorController {
     }
 
     @DeleteMapping("/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteAuthor(@PathVariable Long id) {
         authorService.deleteAuthor(id);
         return ResponseEntity.noContent().build();

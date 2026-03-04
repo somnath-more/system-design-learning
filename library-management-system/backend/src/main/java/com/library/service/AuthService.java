@@ -4,6 +4,6 @@ import com.library.dto.AuthDTO;
 
 public interface AuthService {
     AuthDTO.AuthResponse  register(AuthDTO.RegisterRequest request);
-    String login(String username, String password);
-    void logout(String token);
+    AuthDTO.AuthResponse  login(AuthDTO.LoginRequest request);
+//       void logout(String token);
 }
