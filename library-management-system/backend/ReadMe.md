@@ -520,3 +520,10 @@ INSERT INTO books (isbn, title, author_id, category_id, total_copies, available_
 ---
 
 This enhanced schema provides **maximum flexibility** while maintaining **data integrity** and **performance**! 🎯
+
+// Axios Interceptor with JWT
+✅ Auto-add token to all requests
+✅ Handle 401 → Logout & redirect
+✅ Handle 403 → Permission errors
+✅ Handle 400 → Validation errors
+✅ Network error handling
