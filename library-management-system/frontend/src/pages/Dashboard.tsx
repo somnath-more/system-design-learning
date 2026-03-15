@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Container,
@@ -10,24 +10,26 @@ import {
   Toolbar,
   Button,
   IconButton,
-} from '@mui/material';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import PeopleIcon from '@mui/icons-material/People';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import WarningIcon from '@mui/icons-material/Warning';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { useAuth } from '../hooks/useAuth';
-import { useDispatch } from 'react-redux';
-import { logout } from '../redux/slices/authSlice';
+} from "@mui/material";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import PeopleIcon from "@mui/icons-material/People";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import WarningIcon from "@mui/icons-material/Warning";
+import { useAuth } from "../components/hooks/useAuth";
+import { useDispatch } from "react-redux";
+import { logout } from "../redux/slices/authSlice";
+import { LibraryStats } from "@/types";
+import { bookService } from "@/services/bookService";
+import Header from "@/components/organisms/Header";
 
 const StatCard = ({ title, value, icon, color }: any) => (
   <Paper
     sx={{
       p: 3,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      height: '100%',
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      height: "100%",
     }}
   >
     <Box>
@@ -46,46 +48,33 @@ export default function Dashboard() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [stats, setStats] = useState<LibraryStats>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate("/login");
     }
   }, [isAuthenticated, navigate]);
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
+  // GET LIBRARY STATS
+  useEffect(() => {
+    fetchStats();
+  }, []);
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const data = await bookService.getLibraryStats();
+      setStats(data);
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      {/* Navigation Bar */}
-      <AppBar position="static">
-        <Toolbar>
-          <MenuBookIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Library Management System
-          </Typography>
-          <Button color="inherit" onClick={() => navigate('/dashboard')}>
-            Dashboard
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/books')}>
-            Books
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/borrow-records')}>
-            Borrow Records
-          </Button>
-          {(user?.role === 'ADMIN' || user?.role === 'LIBRARIAN') && (
-            <Button color="inherit" onClick={() => navigate('/users')}>
-              Users
-            </Button>
-          )}
-          <IconButton color="inherit" onClick={handleLogout}>
-            <LogoutIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+       <Header activeTab="dashboard" />
 
       {/* Dashboard Content */}
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -101,31 +90,31 @@ export default function Dashboard() {
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
               title="Total Books"
-              value="1,234"
+              value={loading ? "Loading..." : stats.totalBooks || 0}
               icon={<MenuBookIcon />}
               color="primary.main"
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
-              title="Active Borrows"
-              value="89"
+              title="Available Books"
+              value={loading ? "Loading..." : stats.availableBooks || 0}
               icon={<LibraryBooksIcon />}
               color="success.main"
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
-              title="Total Users"
-              value="456"
+              title="Active Borrows"
+              value={loading ? "Loading..." : stats.borrowedBooks || 0}
               icon={<PeopleIcon />}
               color="info.main"
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
-              title="Overdue"
-              value="12"
+              title="Overdue Books"
+              value={loading ? "Loading..." : stats.dueBooks || 0}
               icon={<WarningIcon />}
               color="error.main"
             />
@@ -147,15 +136,18 @@ export default function Dashboard() {
           <Typography variant="h6" gutterBottom>
             Quick Actions
           </Typography>
-          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-            <Button variant="contained" onClick={() => navigate('/books')}>
+          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+            <Button variant="contained" onClick={() => navigate("/books")}>
               Browse Books
             </Button>
-            <Button variant="outlined" onClick={() => navigate('/borrow-records')}>
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/borrow-records")}
+            >
               View Borrow Records
             </Button>
-            {user?.role === 'ADMIN' && (
-              <Button variant="outlined" onClick={() => navigate('/users')}>
+            {user?.role === "ADMIN" && (
+              <Button variant="outlined" onClick={() => navigate("/users")}>
                 Manage Users
               </Button>
             )}

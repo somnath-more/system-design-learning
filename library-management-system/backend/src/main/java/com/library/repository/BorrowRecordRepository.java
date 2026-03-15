@@ -32,4 +32,7 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Long
     
     @Query("SELECT COUNT(br) FROM BorrowRecord br WHERE br.user.id = :userId AND br.returned = false")
     Long countActiveRecordsByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT COUNT(br) FROM BorrowRecord br WHERE br.returnDate IS NULL AND br.dueDate < CURRENT_DATE")
+    long countOverdueBooks();
 }

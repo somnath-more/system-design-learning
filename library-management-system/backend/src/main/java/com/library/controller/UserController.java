@@ -1,5 +1,6 @@
 package com.library.controller;
 
+import com.library.dto.ApiResponse;
 import com.library.dto.UserDTO;
 import com.library.enums.Role;
 import com.library.service.UserService;
@@ -26,7 +27,7 @@ public class UserController {
 //    It checks the role stored inside Spring Security Context, which comes from your JWT token.
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
+    public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         log.info("Principal: {}", auth.getPrincipal());
         log.info("Authorities: {}", auth.getAuthorities());
@@ -34,24 +35,24 @@ public class UserController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<UserDTO>> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
     
     @GetMapping("/username/{username}")
-    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<ApiResponse<UserDTO>> getUserByUsername(@PathVariable String username) {
         return ResponseEntity.ok(userService.getUserByUsername(username));
     }
     
     @GetMapping("/role/{role}")
     @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
-    public ResponseEntity<List<UserDTO>> getUsersByRole(@PathVariable Role role) {
+    public ResponseEntity<ApiResponse<List<UserDTO>>> getUsersByRole(@PathVariable Role role) {
         return ResponseEntity.ok(userService.getUsersByRole(role));
     }
     
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> updateUser(
+    public ResponseEntity<ApiResponse<UserDTO>> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody UserDTO userDTO) {
         return ResponseEntity.ok(userService.updateUser(id, userDTO));

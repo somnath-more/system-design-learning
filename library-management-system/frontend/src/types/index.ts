@@ -28,6 +28,15 @@ export interface User {
   updatedBy?: string;
 }
 
+export interface PaginatedUserResponse<T> {
+  data: T[];
+  message: string;
+  timestamp: string;
+  statusCode: number;
+  status: string;
+  success: boolean;
+}
+
 // Book Types
 export interface Book {
   id: number;
@@ -76,7 +85,31 @@ export interface PaginatedResponse<T> {
   timestamp: string;
 }
 
+// public class LibraryStatsDTO {
 
+//     private Long totalBooks;
+//     private Long availableBooks;
+//     private Long borrowedBooks;
+//     private Long dueBooks;
+//     private Long returnedBooks;
+
+// }
+// LIBRARY STATS
+
+export interface ApiResponse<T> {
+  statusCode: number;
+  status: string;
+  success: boolean;
+  data: T;
+  message: string;
+}
+export interface LibraryStats {
+  totalBooks?: number;
+  availableBooks?: number;
+  borrowedBooks?: number;
+  dueBooks?: number;
+  returnedBooks?: number;
+}
 // Borrow Record Types
 export interface BorrowRecord {
   id: number;

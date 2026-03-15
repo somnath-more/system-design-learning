@@ -2,6 +2,7 @@ package com.library.service;
 
 import com.library.dto.ApiResponse;
 import com.library.dto.BookDTO;
+import com.library.dto.LibraryStatsDTO;
 import com.library.dto.PaginatedResponse;
 import com.library.enums.BookStatus;
 
@@ -19,4 +20,5 @@ public interface BookService {
     public ApiResponse<List<BookDTO>> getBooksByStatus(BookStatus status);
     void updateAvailableCopies(Long bookId, int change);
     public void deleteBook(Long id) ;
+    ApiResponse<LibraryStatsDTO> getLibraryStats();
 }

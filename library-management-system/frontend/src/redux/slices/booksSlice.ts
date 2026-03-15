@@ -57,6 +57,8 @@ export const fetchCategories = createAsyncThunk('books/fetchCategories', async (
   return await bookService.getAllCategories();
 });
 
+console.log("Books slice loaded",fetchBooks,fetchBookById,searchBooks,createBook,updateBook,deleteBook,fetchCategories);
+
 // Books slice
 const booksSlice = createSlice({
   name: 'books',

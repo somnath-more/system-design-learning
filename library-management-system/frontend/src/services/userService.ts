@@ -1,35 +1,35 @@
 import api from './api';
-import { User, Role } from '../types';
+import { User, Role, PaginatedUserResponse } from '../types';
 
 export const userService = {
   // Get all users
-  getAllUsers: async (): Promise<User[]> => {
-    const { data } = await api.get<User[]>('/users');
-    return data;
+  getAllUsers: async (): Promise<PaginatedUserResponse<User>['data']> => {
+    const response = await api.get<PaginatedUserResponse<User>>('/users');
+    return response.data.data;
   },
 
   // Get user by ID
-  getUserById: async (id: number): Promise<User> => {
-    const { data } = await api.get<User>(`/users/${id}`);
-    return data;
+  getUserById: async (id: number):  Promise<PaginatedUserResponse<User>['data']> => {
+    const response = await api.get<PaginatedUserResponse<User>>(`/users/${id}`);
+    return response.data.data;
   },
 
   // Get user by username
-  getUserByUsername: async (username: string): Promise<User> => {
-    const { data } = await api.get<User>(`/users/username/${username}`);
-    return data;
+  getUserByUsername: async (username: string):  Promise<PaginatedUserResponse<User>['data']> => {
+    const response = await api.get<PaginatedUserResponse<User>>(`/users/username/${username}`);
+    return response.data.data;
   },
 
   // Get users by role
-  getUsersByRole: async (role: Role): Promise<User[]> => {
-    const { data } = await api.get<User[]>(`/users/role/${role}`);
-    return data;
+  getUsersByRole: async (role: Role): Promise<PaginatedUserResponse<User[]>['data']> => {
+    const response = await api.get<PaginatedUserResponse<User[]>>(`/users/role/${role}`);
+    return response.data.data;
   },
 
   // Update user
-  updateUser: async (id: number, user: Partial<User>): Promise<User> => {
-    const { data } = await api.put<User>(`/users/${id}`, user);
-    return data;
+  updateUser: async (id: number, user: Partial<User>):  Promise<PaginatedUserResponse<User>['data']> => {
+    const response = await api.put<PaginatedUserResponse<User>>(`/users/${id}`, user);
+    return response.data.data;
   },
 
   // Delete user

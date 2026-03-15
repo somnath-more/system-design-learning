@@ -1,5 +1,6 @@
 package com.library.service.impl;
 
+import com.library.dto.ApiResponse;
 import com.library.dto.UserDTO;
 import com.library.entity.User;
 import com.library.enums.Role;
@@ -26,34 +27,54 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
+       return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
     }
 
     @Transactional(readOnly = true)
-    public List<UserDTO> getAllUsers() {
+    public ApiResponse<List<UserDTO>> getAllUsers() {
         log.info("S->Fetching all users");
-        return userRepository.findAll().stream()
+        List<UserDTO> userDTOS= userRepository.findAll().stream()
                 .map(user -> modelMapper.map(user, UserDTO.class))
                 .collect(Collectors.toList());
+        return ApiResponse.<List<UserDTO>>builder()
+                .statusCode(200)
+                .status(com.library.enums.ApiStatus.SUCCESS)
+                .success(true)
+                .data(userDTOS)
+                .message("Users retrieved successfully")
+                .build();
     }
     
     @Transactional(readOnly = true)
-    public UserDTO getUserById(Long id) {
+    public ApiResponse<UserDTO> getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        return modelMapper.map(user, UserDTO.class);
+        return ApiResponse.<UserDTO>builder()
+                .statusCode(200)
+                .status(com.library.enums.ApiStatus.SUCCESS)
+                .success(true)
+                .data(modelMapper.map(user, UserDTO.class))
+                .message("User retrieved successfully")
+                .build();
     }
     
     @Transactional(readOnly = true)
-    public UserDTO getUserByUsername(String username) {
+    public ApiResponse<UserDTO> getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
-        return modelMapper.map(user, UserDTO.class);
+        return ApiResponse.<UserDTO>builder()
+                .statusCode(200)
+                .status(com.library.enums.ApiStatus.SUCCESS)
+                .success(true)
+                .data(modelMapper.map(user, UserDTO.class))
+                .message("User retrieved successfully by username")
+                .build();
     }
     
     @Transactional
-    public UserDTO createUser(UserDTO userDTO) {
+    public ApiResponse<UserDTO> createUser(UserDTO userDTO) {
         if (userRepository.existsByUsername(userDTO.getUsername())) {
             throw new BadRequestException("Username already exists");
         }
@@ -66,11 +87,17 @@ public class UserServiceImpl implements UserService {
         user.setActive(true);
         
         User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDTO.class);
+        return ApiResponse.<UserDTO>builder()
+                .statusCode(200)
+                .status(com.library.enums.ApiStatus.SUCCESS)
+                .success(true)
+                .data(modelMapper.map(savedUser, UserDTO.class))
+                .message("User created successfully")
+                .build();
     }
     
     @Transactional
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
+    public ApiResponse<UserDTO> updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         
@@ -87,7 +114,13 @@ public class UserServiceImpl implements UserService {
         user.setActive(userDTO.getActive());
         
         User updatedUser = userRepository.save(user);
-        return modelMapper.map(updatedUser, UserDTO.class);
+        return ApiResponse.<UserDTO>builder()
+                .statusCode(200)
+                .status(com.library.enums.ApiStatus.SUCCESS)
+                .success(true)
+                .data(modelMapper.map(updatedUser, UserDTO.class))
+                .message("User retrieved successfully by username")
+                .build();
     }
     
     @Transactional
@@ -99,9 +132,16 @@ public class UserServiceImpl implements UserService {
     }
     
     @Transactional(readOnly = true)
-    public List<UserDTO> getUsersByRole(Role role) {
-        return userRepository.findByRole(role).stream()
+    public ApiResponse<List<UserDTO>> getUsersByRole(Role role) {
+        List<UserDTO> userDTOS= userRepository.findByRole(role).stream()
                 .map(user -> modelMapper.map(user, UserDTO.class))
                 .collect(Collectors.toList());
+        return ApiResponse.<List<UserDTO>>builder()
+                .statusCode(200)
+                .status(com.library.enums.ApiStatus.SUCCESS)
+                .success(true)
+                .data(userDTOS)
+                .message("Users retrieved successfully for role: " + role)
+                .build();
     }
 }

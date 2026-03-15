@@ -2,6 +2,7 @@ package com.library.controller;
 
 import com.library.dto.ApiResponse;
 import com.library.dto.BookDTO;
+import com.library.dto.LibraryStatsDTO;
 import com.library.dto.PaginatedResponse;
 import com.library.enums.BookStatus;
 import com.library.service.BookService;
@@ -83,5 +84,12 @@ public class BookController {
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/library/stats")
+    public ResponseEntity<ApiResponse<LibraryStatsDTO>> getLibraryStats()
+     {
+         log.info("C -> Fetching library statistics");
+        return ResponseEntity.ok(bookService.getLibraryStats());
     }
 }

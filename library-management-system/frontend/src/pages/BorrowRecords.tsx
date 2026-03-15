@@ -1,43 +1,44 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import Header from '@/components/organisms/Header';
+import AddIcon from '@mui/icons-material/Add';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {
+  Autocomplete,
   Box,
-  Container,
-  Paper,
-  Typography,
   Button,
+  Chip,
+  CircularProgress,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  IconButton,
-  Chip,
-  AppBar,
-  Toolbar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
-  Grid,
+  Typography
 } from '@mui/material';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import LogoutIcon from '@mui/icons-material/Logout';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import AddIcon from '@mui/icons-material/Add';
-import { useAuth } from '../hooks/useAuth';
+import { format } from 'date-fns';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../components/hooks/useAuth';
 import { logout } from '../redux/slices/authSlice';
 import { borrowService } from '../services/borrowService';
+import { bookService } from '@/services/bookService';
 import { BorrowRecord } from '../types';
-import { format } from 'date-fns';
 
 export default function BorrowRecords() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, isAdmin, isLibrarian } = useAuth();
+  const [bookOptions, setBookOptions] = useState<any[]>([]);
 
   const [records, setRecords] = useState<BorrowRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +69,23 @@ export default function BorrowRecords() {
     }
   };
 
+  // Fetch available books for borrowing
+  useEffect(() => {
+      fetchBooks();
+  }, []);
+    const fetchBooks = async () => {
+      try {
+        setLoading(true);
+        const data = await bookService.getAllBooks();
+        setBookOptions(data);
+      } catch (error) {
+        console.error('Error fetching books:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+
   const handleBorrow = async () => {
     try {
       await borrowService.borrowBook(formData);
@@ -96,10 +114,7 @@ export default function BorrowRecords() {
     }
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
-  };
+
 
   const isOverdue = (dueDate: string, returned: boolean) => {
     if (returned) return false;
@@ -109,31 +124,7 @@ export default function BorrowRecords() {
   return (
     <Box>
       {/* Navigation */}
-      <AppBar position="static">
-        <Toolbar>
-          <MenuBookIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Library Management
-          </Typography>
-          <Button color="inherit" onClick={() => navigate('/dashboard')}>
-            Dashboard
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/books')}>
-            Books
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/borrow-records')}>
-            Borrow Records
-          </Button>
-          {(isAdmin() || isLibrarian()) && (
-            <Button color="inherit" onClick={() => navigate('/users')}>
-              Users
-            </Button>
-          )}
-          <IconButton color="inherit" onClick={handleLogout}>
-            <LogoutIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+        <Header activeTab="borrow-records" />
 
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
@@ -163,7 +154,14 @@ export default function BorrowRecords() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {records.map((record) => (
+                {loading ? (
+                              <TableRow>
+                                   <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                                             <CircularProgress />
+                                           </Box>
+                              </TableRow>
+                            ) : (
+              records.map((record) => (
                 <TableRow key={record.id}>
                   <TableCell>{record.bookId}</TableCell>
                   <TableCell>{record.bookTitle || 'N/A'}</TableCell>
@@ -195,7 +193,7 @@ export default function BorrowRecords() {
                     )}
                   </TableCell>
                 </TableRow>
-              ))}
+              )))}
             </TableBody>
           </Table>
         </TableContainer>
@@ -207,7 +205,7 @@ export default function BorrowRecords() {
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
-              <TextField
+              {/* <TextField
                 fullWidth
                 label="Book ID"
                 type="number"
@@ -216,6 +214,12 @@ export default function BorrowRecords() {
                   setFormData({ ...formData, bookId: parseInt(e.target.value) })
                 }
                 required
+              /> */}
+              <Autocomplete
+                options={bookOptions}
+                getOptionLabel={(option) => option.title}
+                onChange={(event, value) => setFormData({ ...formData, bookId: value?.id })}
+                renderInput={(params) => <TextField {...params} label="Book" />}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -253,7 +257,7 @@ export default function BorrowRecords() {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button variant='outlined' onClick={() => setOpenDialog(false)}>Cancel</Button>
           <Button onClick={handleBorrow} variant="contained">
             Borrow
           </Button>

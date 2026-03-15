@@ -32,7 +32,7 @@ export default function Login() {
       await dispatch(login(formData)).unwrap();
       navigate('/dashboard');
     } catch (error) {
-      // Error handled by Redux and toast
+       console.error('Login failed:', error);
     }
   };
 
@@ -97,6 +97,18 @@ export default function Login() {
                 sx={{ mt: 3, mb: 2 }}
               >
                 {loading ? <CircularProgress size={24} /> : 'Sign In'}
+              </Button>
+              
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                disabled={loading}
+                sx={{ mt: 3, mb: 2 }}
+                // startIcon={<GoogleIcon />}
+              >
+                {'Sign In With Google'}
               </Button>
 
               <Typography variant="body2" align="center">

@@ -1,5 +1,5 @@
 import api from './api';
-import { Book, BookStatus, PaginatedResponse } from '../types';
+import { ApiResponse, Book, BookStatus, LibraryStats, PaginatedResponse, PaginatedUserResponse } from '../types';
 
 export const bookService = {
   // Get all books
@@ -65,4 +65,10 @@ export const bookService = {
   deleteBook: async (id: number): Promise<void> => {
     await api.delete(`/books/${id}`);
   },
+
+  // GET STATs
+  getLibraryStats: async (): Promise<ApiResponse<LibraryStats>['data']> => {
+    const response= await api.get('/books/library/stats');
+    return response.data.data;
+  }
 };

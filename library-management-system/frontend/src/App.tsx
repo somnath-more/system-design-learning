@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
 import { store } from './redux/store';
 import { lightTheme } from './theme';
-import { useAuth } from './hooks/useAuth';
+import { useAuth } from './components/hooks/useAuth';
 import { Role } from './types';
 
 // Pages

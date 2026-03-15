@@ -21,10 +21,11 @@ import {
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import LogoutIcon from '@mui/icons-material/Logout';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../components/hooks/useAuth';
 import { logout } from '../redux/slices/authSlice';
 import { userService } from '../services/userService';
 import { User } from '../types';
+import Header from '@/components/organisms/Header';
 
 export default function Users() {
   const navigate = useNavigate();
@@ -65,10 +66,6 @@ export default function Users() {
     }
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
-  };
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -86,29 +83,7 @@ export default function Users() {
   return (
     <Box>
       {/* Navigation */}
-      <AppBar position="static">
-        <Toolbar>
-          <MenuBookIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Library Management
-          </Typography>
-          <Button color="inherit" onClick={() => navigate('/dashboard')}>
-            Dashboard
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/books')}>
-            Books
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/borrow-records')}>
-            Borrow Records
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/users')}>
-            Users
-          </Button>
-          <IconButton color="inherit" onClick={handleLogout}>
-            <LogoutIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+     <Header activeTab="users" />
 
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
@@ -130,7 +105,14 @@ export default function Users() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((u) => (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={9} align="center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              ) : (
+              users.map((u) => (
                 <TableRow key={u.id}>
                   <TableCell>{u.id}</TableCell>
                   <TableCell>{u.username}</TableCell>
@@ -159,7 +141,7 @@ export default function Users() {
                     )}
                   </TableCell>
                 </TableRow>
-              ))}
+              )))}
             </TableBody>
           </Table>
         </TableContainer>

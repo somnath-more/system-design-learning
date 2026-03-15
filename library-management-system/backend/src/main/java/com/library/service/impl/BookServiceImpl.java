@@ -2,6 +2,7 @@ package com.library.service.impl;
 
 import com.library.dto.ApiResponse;
 import com.library.dto.BookDTO;
+import com.library.dto.LibraryStatsDTO;
 import com.library.dto.PaginatedResponse;
 import com.library.entity.Book;
 import com.library.enums.ApiStatus;
@@ -9,6 +10,7 @@ import com.library.enums.BookStatus;
 import com.library.exception.BadRequestException;
 import com.library.exception.ResourceNotFoundException;
 import com.library.repository.BookRepository;
+import com.library.repository.BorrowRecordRepository;
 import com.library.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 public class BookServiceImpl implements BookService {
     
     private final BookRepository bookRepository;
+    private final BorrowRecordRepository borrowRecordRepository;
     private final ModelMapper modelMapper;
     
     @Transactional(readOnly = true)
@@ -133,7 +136,33 @@ public class BookServiceImpl implements BookService {
         }
         bookRepository.deleteById(id);
     }
-    
+
+    @Override
+    @Transactional(readOnly = true)
+    public ApiResponse<LibraryStatsDTO> getLibraryStats() {
+        long totalBooks = bookRepository.countTotalBooks();
+        long availableBooks = bookRepository.countBooksByStatus(BookStatus.AVAILABLE);
+        long borrowedBooks = bookRepository.countBooksByStatus(BookStatus.BORROWED);
+        long overdueBooks = borrowRecordRepository.countOverdueBooks();
+        log.info("Total Books: {}, Available Books: {}, Borrowed Books: {}, Overdue Books: {}",
+                totalBooks, availableBooks, borrowedBooks, overdueBooks);
+
+        LibraryStatsDTO stats = LibraryStatsDTO.builder()
+                .totalBooks(totalBooks)
+                .availableBooks(availableBooks)
+                .borrowedBooks(borrowedBooks)
+                .dueBooks(overdueBooks)
+                .build();
+
+        return ApiResponse.<LibraryStatsDTO>builder()
+                .statusCode(200)
+                .status(ApiStatus.SUCCESS)
+                .success(true)
+                .data(stats)
+                .message("Library statistics retrieved successfully")
+                .build();
+    }
+
     @Transactional(readOnly = true)
     public ApiResponse<List<BookDTO>> searchBooks(String keyword) {
         List<BookDTO>bookDTOS= bookRepository.searchBooks(keyword).stream()

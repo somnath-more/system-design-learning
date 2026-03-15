@@ -32,7 +32,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../components/hooks/useAuth';
 import { logout } from '../redux/slices/authSlice';
 import {
   fetchBooks,
@@ -45,6 +45,7 @@ import {
 } from '../redux/slices/booksSlice';
 import { AppDispatch } from '../redux/store';
 import { Book, BookStatus } from '../types';
+import Header from '@/components/organisms/Header';
 
 export default function Books() {
   const navigate = useNavigate();
@@ -129,11 +130,6 @@ export default function Books() {
     }
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
-  };
-
   const getStatusColor = (status: BookStatus) => {
     switch (status) {
       case BookStatus.AVAILABLE:
@@ -152,31 +148,7 @@ export default function Books() {
   return (
     <Box>
       {/* Navigation */}
-      <AppBar position="static">
-        <Toolbar>
-          <MenuBookIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Library Management
-          </Typography>
-          <Button color="inherit" onClick={() => navigate('/dashboard')}>
-            Dashboard
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/books')}>
-            Books
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/borrow-records')}>
-            Borrow Records
-          </Button>
-          {(isAdmin() || isLibrarian()) && (
-            <Button color="inherit" onClick={() => navigate('/users')}>
-              Users
-            </Button>
-          )}
-          <IconButton color="inherit" onClick={handleLogout}>
-            <LogoutIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+         <Header activeTab="books" />
 
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
