@@ -11,7 +11,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: library-management-system
+        working-directory: backend
 
     steps:
       - name: Checkout code
