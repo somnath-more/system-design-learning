@@ -38,7 +38,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "library-management-system/backend.tar"
+          source: "library-management-system/backend/backend.tar"
           target: "/home/ubuntu"
 
       - name: Deploy on EC2
