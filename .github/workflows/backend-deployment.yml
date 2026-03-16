@@ -50,5 +50,5 @@ jobs:
           script: |
             docker stop library-backend || true
             docker rm library-backend || true
-            docker load < backend.tar
+            docker load < /home/ubuntu/backend.tar
             docker run -d -p 8080:8080 --name library-backend library-backend
