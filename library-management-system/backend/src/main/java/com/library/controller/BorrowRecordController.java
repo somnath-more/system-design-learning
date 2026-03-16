@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/borrow-records")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class BorrowRecordController {
     
