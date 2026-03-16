@@ -10,7 +10,6 @@ export const authService = {
 
   // Register new user
   register: async (userData: RegisterRequest): Promise<AuthResponse> => {
-    debugger
     const { data } = await api.post<AuthResponse>('/auth/register', userData);
     console.log(data)
     return data;
