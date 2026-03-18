@@ -1,5 +1,5 @@
 import api from './api';
-import { BorrowRecord, PaginatedBorrowResponse } from '../types';
+import { ApiResponse, BorrowRecord, PaginatedBorrowResponse } from '../types';
 
 export const borrowService = {
   // Get all borrow records
@@ -18,15 +18,16 @@ export const borrowService = {
 
   // Get all records for a user
   getRecordsByUserId: async (userId: number): Promise<BorrowRecord[]> => {
-    const { data } = await api.get<BorrowRecord[]>(`/borrow-records/user/${userId}`);
+    const { data } = await api.get<ApiResponse<BorrowRecord[]>>(`/borrow-records/user/${userId}`);
+    console.log("User Records", data);
     
-    return data;
+    return data.data;
   },
 
   // Get active (unreturned) records for a user
-  getActiveRecordsByUserId: async (userId: number): Promise<BorrowRecord[]> => {
-    const { data } = await api.get<BorrowRecord[]>(`/borrow-records/user/${userId}/active`);
-    return data;
+  getActiveRecordsByUserId: async (userId: number): Promise<ApiResponse<BorrowRecord[]>['data']> => {
+    const { data } = await api.get<ApiResponse<BorrowRecord[]>>(`/borrow-records/user/${userId}/active`);
+    return data.data;
   },
 
   // Get overdue records
