@@ -20,6 +20,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { register, selectAuthLoading } from "../redux/slices/authSlice";
 import { AppDispatch } from "../redux/store";
 import { RegisterRequest, Role } from "../types";
+import { CREATE_ACCOUNT_LABEL, JOIN_LIBRARY_COMMUNITY } from "@/constants";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -96,10 +97,10 @@ export default function Register() {
                 }}
               />
               <Typography variant="h5" fontWeight={700}>
-                Create Account
+                {CREATE_ACCOUNT_LABEL}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Join our library community 📚
+                {JOIN_LIBRARY_COMMUNITY}
               </Typography>
             </Box>
 
